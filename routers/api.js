@@ -60,7 +60,20 @@ apiRouter.post('/messages/encrypt', EntryConfirmation,async (req,res) => {
 
 
 apiRouter.post('/messages/decrypt', EntryConfirmation,async (req,res) => {
-
+    try{
+        const {messageId} = req.body;
+        const { data, error } = await supabase
+        .from('messages')
+        .select()
+        .eq('id', messageId)
+        const text = data[0].encrypted_text
+        const fixText = reversText(text.toLowerCase())
+        if (fixText){return res.status(200).json({id: messageId, decryptedText: fixText})}
+        else{ return res.status(200).json({id: messageId, decryptedText: null, error: "CANNOT_DECRYPT"})}
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({nessage: "The server could not connect."})
+    }
 })
 
 
