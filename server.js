@@ -1,5 +1,6 @@
 import express from 'express';
 import supabase from './DB/supabase.js';
+import apiRouter from './routers/api.js'
 
 
 
