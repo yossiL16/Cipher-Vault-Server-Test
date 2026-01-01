@@ -1,8 +1,7 @@
 import express from 'express';
 import supabase from '../DB/supabase.js';
 import {connectMongo} from '../DB/mongodb.js';
-import{BodyInsertionTest, EntryConfirmation} from '../middleware/validation.js'
-import { ObjectId } from 'mongodb';
+import{BodyInsertionTest, EntryConfirmation,checkBody1,checkBody2} from '../middleware/validation.js'
 import {reversText} from '../utils/revers.js'
 
 
@@ -16,8 +15,6 @@ export const db = await connectMongo({
 
 apiRouter.post('/auth/register',BodyInsertionTest, async (req,res) => {
     try{
-        console.log("aaa");
-        
         const {username, password} = req.body
 
         const data = await db.collection('users').find({username: username}).toArray();
@@ -36,7 +33,7 @@ apiRouter.post('/auth/register',BodyInsertionTest, async (req,res) => {
 }) 
 
 
-apiRouter.post('/messages/encrypt', EntryConfirmation,async (req,res) => {
+apiRouter.post('/messages/encrypt', EntryConfirmation,checkBody1,async (req,res) => {
     const {message, cipherType} = req.body;
     const username = req.headers['x-username']
     if(cipherType === "revers"){
@@ -59,7 +56,7 @@ apiRouter.post('/messages/encrypt', EntryConfirmation,async (req,res) => {
 
 
 
-apiRouter.post('/messages/decrypt', EntryConfirmation,async (req,res) => {
+apiRouter.post('/messages/decrypt', EntryConfirmation,checkBody2,async (req,res) => {
     try{
         const {messageId} = req.body;
         const { data, error } = await supabase
@@ -76,6 +73,18 @@ apiRouter.post('/messages/decrypt', EntryConfirmation,async (req,res) => {
     }
 })
 
+
+
+apiRouter.get('/users/me', EntryConfirmation, async (req,res) => {
+    try{
+    const name = req.headers['x-username'];
+    const data = await db.collection('users').find({username: name}).toArray();
+    res.status(200).json({username: data[0].username,encryptedMessagesCount : data[0].encryptedMessagesCount })
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({message:"The server could not connect."})
+    }
+})
 
 
 export default apiRouter;
