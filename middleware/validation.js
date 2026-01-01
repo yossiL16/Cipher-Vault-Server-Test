@@ -28,8 +28,9 @@ export async function EntryConfirmation(req,res,next) {
 
 export function checkBody1(req,res,next) {
     const {message, cipherType} = req.body;
+ 
     if(!message || cipherType === undefined) {return res.status(400).json({error: "MISSING_FIELDS"})}
-    if(typeof message !== "string" || cipherType !== "string"){return res.status(400).json({error:"The type is incorrect."})}
+    if(typeof message !== "string" || typeof cipherType !== "string"){return res.status(400).json({error:"The type is incorrected."})}
     next()
 }
 

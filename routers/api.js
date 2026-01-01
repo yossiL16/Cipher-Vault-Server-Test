@@ -47,7 +47,7 @@ apiRouter.post('/messages/encrypt', EntryConfirmation,checkBody1,async (req,res)
             inserted_at : new Date().toISOString()
         })
         .select()
-        // await db.collection('users').updateOne({username:username}, {$set: {encryptedMessagesCount : encryptedMessagesCount++}})
+        await db.collection('users').updateOne({username:username}, {$inc: {'encryptedMessagesCount' : 1}})
         res.status(201).json({id: result.data[0].id, cipherType: result.data[0].cipher_type, encryptedText: result.data[0].encrypted_text })
     } else{
         res.status(400).json({messege: "you can only revers"})
